@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		<title>hammer jquery append bug</title>
+		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="js/hammer.js"></script>
+    	<script type="text/javascript" src="js/jquery.hammer.js"></script>
+
+	    <style>
+			body{
+				background-color: #c2dcbd;
+			}
+			.float{
+				float: left;
+				min-width: 22%;
+			}
+			
+			.bkgOrange {
+				background-color: #fd721e !important;	
+			}
+			.bkgDarkOrange {
+				background-color: #e1511d !important;	
+			}
+			
+			.bkgBlue {
+				background-color: #57a5da !important;
+			}
+			.bkgLightBlue {
+				background-color: #99bad7 !important;
+			}
+			.bkgPurple {
+				background-color: #9871af !important;	
+			}
+
+			/* Border color common for .dButton */
+			.dButton .dButtonIndex {
+				border: 2px solid #fffcfa;
+			}
+			
+			/* Gradient shadow */
+			.bkgGradient {
+				/* FF3.6+ */
+				background-image: -moz-linear-gradient(top, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.25) 100%) !important;
+				/* Chrome,Safari4+ */
+				background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.25)), color-stop(100%,rgba(0,0,0,0.25))) !important;
+				/* Chrome10+,Safari5.1+ */
+				background-image: -webkit-linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%) !important;
+				/* Opera 11.10+ */
+				background-image: -o-linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%) !important;
+				/* IE10+ */
+				background-image: -ms-linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%) !important;
+				/* W3C */
+				background-image: linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%) !important;
+				/* IE6-9 */
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffffff', endColorstr='#ff000000',GradientType=0 ) !important; 
+			}
+			/* END Gradient shadow*/
+
+			.dButton{
+				position: relative;
+				left:0px;
+			}
+			
+			/* Span transition container */
+			.dButton{
+				white-space:nowrap;
+				cursor: pointer;
+				transition: all .5s ease-in-out;
+				-webkit-transition: all .5s ease-in-out; 
+				-moz-transition: all .5s ease-in-out;
+				-o-transition: all .5s ease-in-out; 
+			}
+			
+			.dButton .dButtonIndex {			
+				padding:5px;
+				/* Font color */
+				color:#070707;
+				
+				/* Gradient for query index form*/
+				/* 100% black to 100% white 25% opacity */
+				background-color: #ffffff;
+				background-image: -moz-linear-gradient(top, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.25) 100%); /* FF3.6+ */
+				background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.25)), color-stop(100%,rgba(0,0,0,0.25))); /* Chrome,Safari4+ */
+				background-image: -webkit-linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%); /* Chrome10+,Safari5.1+ */
+				background-image: -o-linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%); /* Opera 11.10+ */
+				background-image: -ms-linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%); /* IE10+ */
+				background-image: linear-gradient(top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,0.25) 100%); /* W3C */
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff4CA4C8', endColorstr='#ff0082b3',GradientType=0 ); /* IE6-9 */
+			
+				color: #ffffff;
+				
+				/* Allow for padding & borders */
+				line-height: 35px; 
+			
+				/* Borders */
+				border-radius: 10px 10px 10px 10px;
+				
+			}
+
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
+			    //hammer setup
+				var dButtonHammerOptions = {
+					tap_max_interval: 700, // seems to bee needed for IE8
+					prevent_default: true,
+					drag_min_distance: 4
+			
+				};
+				callout = document.getElementById('textText');
+			    function shout(e){
+			    	
+			    	var target = e.target ;
+			        var direction = e.direction;
+					var jtarget = $(e.target);
+					var jparent = jtarget.parent();
+			    	var msg = '…waiting for interaction';
+					
+					
+					var thisBucket = jtarget.parent().attr('class');
+					thisBucket.split("\\s+");
+					thisBucket = thisBucket[thisBucket.length -1];
+					console.log('thisBucket: '+thisBucket);
+					if(direction === "left"){
+						var newBucket = parseInt(thisBucket) - 1;
+						if(newBucket >= 1){
+							console.dir('Moving left to: '+newBucket);
+							moveBuckets(jtarget,jparent,$('.'+newBucket));
+						}
+					}
+					else if(direction === "right"){
+						var newBucket = parseInt(thisBucket) + 1;
+						if(newBucket <= 2){
+							console.dir('Moving right to: '+newBucket);
+							moveBuckets(jtarget,jparent,$('.'+newBucket));
+						}
+					}
+					msg = e.type + ' on ' + target.innerHTML;
+			
+			
+			    	var tester = e.type;
+			    	switch(tester) {
+			    	   case 'dragstart':
+			    	       var flicktype = 'flick' + direction;
+			    	       msg = flicktype + ' on ' + target.innerHTML;
+			    	       break;
+			    	   case 'tap':
+			    	       msg = 'tap' + ' on ' + target.innerHTML;
+			    	       break;
+			    	   case 'hold':
+			    	       msg = 'longtap' + ' on ' + target.innerHTML;
+			    	       break;
+			    	   default:
+			    	       break;
+			    	}
+			        $(callout).html('Ooh! a ' + msg);
+			        console.dir(e);
+			    }
+				var dButtonHammer = $('.dButton').hammer(dButtonHammerOptions).bind('tap hold dragstart',function(ev){shout(ev)});
+
+				// Function to move buttons from buckets to buckets
+				function moveBuckets(button, bucketFrom, bucketTo){
+					//console.log('moving from '+bucketFrom.html() + ' to '+bucketTo.html());
+					
+					// Offsets x, y
+					var fromOffset = bucketFrom.offset();
+					var toOffset = bucketTo.offset();
+					
+					// Difference in X
+					var dx = fromOffset.left - toOffset.left;
+					
+					// Log the change
+					$("#textText").html("From Offset Left: "+fromOffset.left+" to Offset left: "+toOffset.left);
+			
+					
+					var dy = fromOffset.top - toOffset.top;
+					var fromHeight = bucketFrom.height();
+					var toHeight = bucketTo.height();
+					var heightChange = toHeight = fromHeight;
+					console.log(heightChange);
+					var distance = Math.sqrt(dx * dx + dy * dy);
+					
+					// Animate our button to position
+					$(button).animate({
+						left: "-="+dx ,
+						top: "-="+dy
+					}, 100, function() {
+						// Animation complete.
+						console.log('move animate complete');
+						// Timeout the container move for transition
+						setTimeout(function() {
+							//$(button).appendTo(bucketTo).css("left",0).css("top",0);
+							appnd($(button),bucketTo).css("left",0).css("top",0);
+							console.log('move element container complete');
+						}, 700);
+						setTimeout(function() {
+							updateBucketCounts();
+						}, 800);
+					});
+				// END moveBuckets	
+				}
+				
+				function updateBucketCounts() {
+			
+					$('div.float').each(function(index){
+						var cnt = $(this).children('.dButton').length;
+						$(this).find('span.count').html(cnt);	
+					});
+			
+				// END updateBucketCounts	
+				}
+
+				function appnd(but,to){
+					but.appendTo(to);
+					
+					//experiment to attach a new hammer (ugly! doubles number of console msgs with each throw, but is same in iPad as other browsers)
+					//but.hammer(dButtonHammerOptions);
+					
+					//experiment to unbind and rebind (fixes nothing in iPad)
+					//but.unbind();
+					//.bind('tap hold dragstart',function(ev){alert('boo');});
+
+					return but;
+				}
+
+			// END document onready	
+			});
+
+		</script>
+	</head>
+	<body>
+	
+	    <h2>Drag/Flick buttons from one Bucket to the other...</h2>
+		<!-- Start Button SET-->
+		<div class="float 1">
+			<div style="position:relative;">Bucket 1 (<span class="count">4</span>)</div>	
+
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgBlue bkgGradient'>this</span><br/></span>
+			
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgBlue bkgGradient'>that</span><br/></span>
+			
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgLightBlue bkgGradient'>other</span><br/></span>
+			
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgLightBlue bkgGradient'>next</span><br/></span>
+			
+		</div>
+		<!-- End Button SET-->
+		
+		<!-- Start Button SET-->
+		<div class="float 2" style="position:relative;top:100px;">
+			<div style="position:relative;">Bucket 2 (<span class="count">4</span>)</div>	
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgDarkOrange bkgGradient'>neither</span><br/></span>
+			
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgDarkOrange bkgGradient'>niether</span><br/></span>
+			
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgDarkOrange bkgGradient'>nether</span><br/></span>
+			
+			
+			<span class="dButton">
+				<span class='dButtonIndex bkgDarkOrange bkgGradient'>zither</span><br/></span>
+			
+		</div>
+		<!-- End Button SET-->
+	</body>
+</html>
+
+
